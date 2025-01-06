@@ -1,6 +1,6 @@
 # MySQL Primary/Replica Setup with Docker
 
-This guide documents the setup of a MySQL Primary/Replica configuration using Docker containers, including PHPMyAdmin for database management.
+This guide documents the setup of a MySQL Primary/Replica configuration using Docker containers, including phpMyAdmin for database management.
 
 ## 1. Docker Compose Configuration
 
@@ -50,9 +50,9 @@ services:
     networks:
       - mysql
 
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: phpmyadmin
+  phpMyAdmin:
+    image: phpMyAdmin:latest
+    container_name: phpMyAdmin
     environment:
       PMA_HOSTS: mysql-primary,mysql-replica
       PMA_USER: root
@@ -162,7 +162,7 @@ This should fail with an error about super-read-only mode.
 
 - Primary MySQL: localhost:3306
 - Replica MySQL: localhost:3307
-- PHPMyAdmin: http://localhost:8080
+- phpMyAdmin: http://localhost:8080
 - Login credentials:
   - Username: root
   - Password: your-root-password
@@ -176,7 +176,7 @@ All containers are connected to a Docker network named 'mysql', which allows the
 - All data is persisted in Docker volumes: `primary_data` and `replica_data`
 - The replica is configured as read-only and will reject direct write operations
 - All write operations should be performed on the primary server
-- Both servers can be managed through PHPMyAdmin
+- Both servers can be managed through phpMyAdmin
 - The replica can be used for read operations to reduce load on the primary
 
 ## 8. Success Criteria
@@ -185,7 +185,7 @@ The setup is working correctly when:
 - The primary accepts write operations
 - Changes on the primary are replicated to the replica
 - The replica rejects direct write operations
-- PHPMyAdmin can connect to both servers
+- phpMyAdmin can connect to both servers
 - SHOW REPLICA STATUS shows no errors
 
 ## 9. Container Restart Behavior
@@ -240,7 +240,7 @@ command: >
   --wait_timeout=600
 ```
 
-PHPMyAdmin is also configured to handle larger uploads:
+phpMyAdmin is also configured to handle larger uploads:
 ```yaml
 environment:
   [previous settings...]
@@ -404,24 +404,24 @@ SELECT * FROM test;"
 - If the database doesn't appear on the replica, check replication status
 - Remember that the replica is read-only, so you cannot create databases directly on it
 
-## 14. PHPMyAdmin Configuration Storage
+## 14. phpMyAdmin Configuration Storage
 
-When using PHPMyAdmin with a primary/replica setup, you may encounter a warning message on the replica interface about not being able to save configuration due to the super-read-only setting. This is normal behavior but can be resolved.
+When using phpMyAdmin with a primary/replica setup, you may encounter a warning message on the replica interface about not being able to save configuration due to the super-read-only setting. This is normal behavior but can be resolved.
 
 ### The Issue
-When accessing the replica server through PHPMyAdmin, you might see:
+When accessing the replica server through phpMyAdmin, you might see:
 ```
 Could not save configuration
 #1290 - the mysql server is running with the super-read-only option so it cannot execute this statement
 ```
 
 ### Solution
-Configure PHPMyAdmin to store its configuration only on the primary server by updating the PHPMyAdmin service in your docker-compose.yml:
+Configure phpMyAdmin to store its configuration only on the primary server by updating the phpMyAdmin service in your docker-compose.yml:
 
 ```yaml
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: phpmyadmin
+  phpMyAdmin:
+    image: phpMyAdmin:latest
+    container_name: phpMyAdmin
     environment:
       PMA_HOSTS: mysql-primary,mysql-replica
       PMA_USER: root
@@ -430,7 +430,7 @@ Configure PHPMyAdmin to store its configuration only on the primary server by up
       PMA_ABSOLUTE_URI: http://localhost:8080/
       BLOWFISH_SECRET: your-blowfish-secret
       UPLOAD_LIMIT: 20M
-      PMA_PMADB: phpmyadmin
+      PMA_PMADB: phpMyAdmin
       PMA_CONTROLHOST: mysql-primary
       PMA_CONTROLUSER: root
       PMA_CONTROLPASS: your-root-password
@@ -442,7 +442,7 @@ Configure PHPMyAdmin to store its configuration only on the primary server by up
 
 Key configuration additions:
 - `PMA_PMADB`: Specifies the configuration database name
-- `PMA_CONTROLHOST`: Directs PHPMyAdmin to store configuration only on the primary
+- `PMA_CONTROLHOST`: Directs phpMyAdmin to store configuration only on the primary
 - `PMA_CONTROLUSER` and `PMA_CONTROLPASS`: Credentials for configuration storage
 
 ### Applying the Changes
@@ -452,7 +452,7 @@ docker-compose up -d
 ```
 
 ### Notes
-- This configuration ensures PHPMyAdmin only attempts to store its settings on the primary server
+- This configuration ensures phpMyAdmin only attempts to store its settings on the primary server
 - The warning message should no longer appear when accessing the replica
-- The replica remains read-only; this only affects PHPMyAdmin's internal configuration storage
+- The replica remains read-only; this only affects phpMyAdmin's internal configuration storage
 - If you prefer, you can also simply ignore the warning as it doesn't affect the functionality of the replica or the replication setup
