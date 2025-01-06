@@ -1,15 +1,13 @@
 # Database dumps
 *.sql
 
-# Example files
-*.example
-
 # Environment files
 .env
 .env.*
 
 # Docker
 .docker/
+docker-compose.yml
 docker-compose.override.yml
 
 # Logs
